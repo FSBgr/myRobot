@@ -7,12 +7,9 @@ import simbad.sim.*;
 import java.awt.*;
 
 public class Env extends EnvironmentDescription {
-    public Color3f white = new Color3f(Color.white);
-    public Color3f lightGray = new Color3f(Color.lightGray);
-    public Color3f yellow = new Color3f(Color.yellow);
-    public Color3f magenta = new Color3f(Color.MAGENTA);
-
-    public Wall wall1, wall2, wall3, wall4;
+    Color3f white = new Color3f(Color.white);
+    Color3f lightGray = new Color3f(Color.lightGray);
+    Wall wall1, wall2, wall3, wall4;
 
     Env(){
         setWorldSize(100);
