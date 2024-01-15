@@ -1,7 +1,8 @@
 package com.company;
 import simbad.gui.Simbad;
 
-public class MyFirst {
+public class Main {
     public static void main(String[] args) {
         Simbad frame = new Simbad(new Env() ,false); }
+
 }
