@@ -13,7 +13,7 @@ import javax.vecmath.Vector3d;
 public class IBug2 {
     RangeSensorBelt bumpers, sonars;
     LightSensor l, r, m;
-    double localMax, intensityH, intensityLeft, right, middle, K1=5, K2=0.8, K3=1, SAFETY=1, bumperDetectionThreshold=0.19;
+    double localMax, intensityH, intensityLeft, right, middle, K1=5, K2=0.8, K3=1, SAFETY=1, bumperDetectionThreshold=0.200000002;
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
@@ -64,6 +64,7 @@ public class IBug2 {
     private void circumNavigate(){
         int min;
         min=0;
+        myRobot.setTranslationalVelocity(-1);
         for (int i=1;i<sonars.getNumSensors();i++)
             if (sonars.getMeasurement(i)<sonars.getMeasurement(min))
                 min=i;
@@ -93,8 +94,8 @@ public class IBug2 {
 
         for(int i=0; i<bumpers.getNumSensors(); i++){
             phBumper = wrapToPi(bumpers.getSensorAngle(i));
+            //if (Math.abs(phBumper)<=Math.PI/2)
             minDistBumper = Math.min(minDistBumper, bumpers.getMeasurement(i));
-            //System.out.println(bumpers.getMeasurement(i));
         }
 
         for (int i=0;i<sonars.getNumSensors();i++)       {
@@ -103,9 +104,9 @@ public class IBug2 {
                 minDistSonar=Math.min(minDistSonar,sonars.getMeasurement(i));
         }
 
-        //System.out.println(minDistBumper);
+        System.out.println(minDistBumper);
 
-        if(intensityLeft >=0.0329){
+        if(intensityLeft >=0.075){
             state= robotState.GoalReached;
         }
 
@@ -120,7 +121,7 @@ public class IBug2 {
                 state=robotState.MoveToGoal;
             }
             else{
-                myRobot.setTranslationalVelocity(-1);
+                myRobot.setTranslationalVelocity(-3);
                 myRobot.setRotationalVelocity(0);
                 state=robotState.CircumNavigate;
                 localMax = intensityLeft;
@@ -132,9 +133,21 @@ public class IBug2 {
         }
 
         if (state==robotState.CircumNavigate) {
-            //System.out.println(intensityL + " " + left);
-            if (localMax<intensityLeft)
+            if(foundObstacle(minDistBumper)){
+                myRobot.setTranslationalVelocity(-1);
                 circumNavigate();
+            }
+            else if(!foundObstacle(minDistBumper) && localMax<intensityLeft)
+            {
+                state = robotState.MoveToGoal;
+            }
+            else {
+                circumNavigate();
+            }
+
+            //System.out.println(intensityL + " " + left);
+            //if (localMax<intensityLeft)
+                //circumNavigate();
             /*if (localMax < intensityLeft) {
                 circumNavigate();
                 //state = robotState.MoveToGoal;
@@ -158,7 +171,7 @@ public class IBug2 {
                     //state = robotState.MoveToGoal;
                 //}
             }
-        System.out.println(state);
+        //System.out.println(state);
         }
             /*else            {
                 if (cp.distance(sp)>ZERO && !circle)

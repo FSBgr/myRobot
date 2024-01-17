@@ -12,7 +12,7 @@ import javax.vecmath.Vector3d;
 public class IBug {
     RangeSensorBelt bumpers, sonars;
     LightSensor l, r, m;
-    double intensityL, localMaxIntensity, intensityLeft, right, middle, K1=5, K2=0.8, K3=1, SAFETY=1;
+    double intensityL, intensityH, intensityLeft, intensityRight, intensityMiddle, K1=5, K2=0.8, K3=1, SAFETY=1;
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
@@ -52,7 +52,7 @@ public class IBug {
     }
 
     private void moveToGoal(){
-        myRobot.setRotationalVelocity(Math.signum(right- intensityLeft)); // v_orientation
+        myRobot.setRotationalVelocity(Math.signum(intensityRight - intensityLeft)); // v_orientation
         myRobot.setTranslationalVelocity(2);
     }
 
@@ -78,9 +78,9 @@ public class IBug {
 
     public void step(){
         double minDist=2*SAFETY;
-        middle = m.getLux();
+        intensityMiddle = m.getLux();
         intensityLeft = l.getLux();
-        right = r.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
+        intensityRight = r.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
 
         //System.out.println(sonars.getMeasurement(0) +" "+ sonars.getMeasurement(1) +" "+ sonars.getMeasurement(2) +" "+ sonars.getMeasurement(3));
 
@@ -106,15 +106,26 @@ public class IBug {
             }
             else {
                 state=robotState.CircumNavigate;
-                localMaxIntensity = intensityLeft;
+                intensityH = intensityRight;
                 //sp = null;
                 //circle=false;
             }
         }
+
         if (state==robotState.CircumNavigate) {
-            if (localMaxIntensity < intensityLeft) {
-                circumNavigate();
+            circumNavigate();
+            if (intensityH < intensityLeft) {
+                //circumNavigate();
+                //System.out.println(intensityL - intensityRight);
+                //System.out.println(intensityMiddle);
             }
+            //TODO: Find a way to break the circumnavigation using left and right lightsensors somehow maybe (l-r)^2
+            if(intensityRight > intensityLeft){
+                state = robotState.MoveToGoal;
+            }
+            /*if(intensityLeft-intensityRight>0 && sonars.getMeasurement(0)>SAFETY){
+                state = robotState.MoveToGoal;
+            }*/
             /*if (intensityH>intensityL){
                 myRobot.setRotationalVelocity(Math.signum(right- intensityLeft));
 

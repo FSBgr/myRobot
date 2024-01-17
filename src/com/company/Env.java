@@ -22,11 +22,11 @@ public class Env extends EnvironmentDescription {
         wall4 = new Wall(new Vector3d(1, 0, 7), 4,1, this);
 
         //add(new Box(new Vector3d(-5,0,-5), new Vector3f(1,1,1), this));
-        add(new Box(new Vector3d(-4,0,1), new Vector3f(1,1,1),this));
+        /*add(new Box(new Vector3d(-4,0,1), new Vector3f(1,1,1),this));
         add(new Box(new Vector3d(-5,0,4), new Vector3f(1,1,1),this));
-        add(new Box(new Vector3d(-4,0,7), new Vector3f(1,1,1),this));
+        add(new Box(new Vector3d(-4,0,7), new Vector3f(1,1,1),this));*/
         add(wall1);
-        add(wall2);
+        //add(wall2);
         add(wall3);
         //add(wall4);
 
