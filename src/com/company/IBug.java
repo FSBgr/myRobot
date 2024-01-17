@@ -86,7 +86,7 @@ public class IBug {
 
         intensityL = intensityLeft;
 
-        if(intensityLeft >=0.0329){
+        if(intensityRight >=0.06){
             state= robotState.GoalReached;
         }
 

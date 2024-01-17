@@ -25,8 +25,9 @@ public class Env extends EnvironmentDescription {
         /*add(new Box(new Vector3d(-4,0,1), new Vector3f(1,1,1),this));
         add(new Box(new Vector3d(-5,0,4), new Vector3f(1,1,1),this));
         add(new Box(new Vector3d(-4,0,7), new Vector3f(1,1,1),this));*/
+        //TODO: Try a layout with a Π shape
         add(wall1);
-        //add(wall2);
+        add(wall2);
         add(wall3);
         //add(wall4);
 
