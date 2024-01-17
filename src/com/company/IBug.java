@@ -120,6 +120,7 @@ public class IBug {
                 //System.out.println(intensityMiddle);
             }
             //TODO: Find a way to break the circumnavigation using left and right lightsensors somehow maybe (l-r)^2
+            //TODO: Find a way to include iL and iH into the control checks, maybe even try changing the light position
             if(intensityRight > intensityLeft){
                 state = robotState.MoveToGoal;
             }
