@@ -1,5 +1,6 @@
 package com.company;
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import simbad.sim.Agent;
 import simbad.sim.LightSensor;
 import simbad.sim.RangeSensorBelt;
@@ -9,10 +10,10 @@ import java.lang.Math;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
-public class IBug {
+public class IBug2 {
     RangeSensorBelt bumpers, sonars;
     LightSensor l, r, m;
-    double intensityL, localMaxIntensity, intensityLeft, right, middle, K1=5, K2=0.8, K3=1, SAFETY=1;
+    double localMax, intensityH, intensityLeft, right, middle, K1=5, K2=0.8, K3=1, SAFETY=1, bumperDetectionThreshold=0.19;
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
@@ -21,7 +22,7 @@ public class IBug {
     private robotState state;
     int temp=0;
 
-    public IBug(Agent myRobot, RangeSensorBelt sonars, RangeSensorBelt bumpers, LightSensor l, LightSensor r, LightSensor m){
+    public IBug2(Agent myRobot, RangeSensorBelt sonars, RangeSensorBelt bumpers, LightSensor l, LightSensor r, LightSensor m){
         this.myRobot = myRobot;
         this.bumpers = bumpers;
         this.sonars = sonars;
@@ -29,6 +30,10 @@ public class IBug {
         this.r=r;
         this.m=m;
         state=robotState.MoveToGoal;
+    }
+
+    private boolean foundObstacle(double minDistBumper){
+        return minDistBumper <= bumperDetectionThreshold;
     }
 
     private Point3d getSensedPoint(int sonar){
@@ -77,14 +82,28 @@ public class IBug {
     }
 
     public void step(){
-        double minDist=2*SAFETY;
+        double minDistSonar=4*SAFETY;
+        double minDistBumper, phBumper;
+
         middle = m.getLux();
         intensityLeft = l.getLux();
         right = r.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
+        minDistBumper = Double.POSITIVE_INFINITY;
+        localMax = Double.POSITIVE_INFINITY;
 
-        //System.out.println(sonars.getMeasurement(0) +" "+ sonars.getMeasurement(1) +" "+ sonars.getMeasurement(2) +" "+ sonars.getMeasurement(3));
+        for(int i=0; i<bumpers.getNumSensors(); i++){
+            phBumper = wrapToPi(bumpers.getSensorAngle(i));
+            minDistBumper = Math.min(minDistBumper, bumpers.getMeasurement(i));
+            //System.out.println(bumpers.getMeasurement(i));
+        }
 
-        intensityL = intensityLeft;
+        for (int i=0;i<sonars.getNumSensors();i++)       {
+            double ph = wrapToPi(sonars.getSensorAngle(i));
+            if (Math.abs(ph/*-f2g*/)<=Math.PI/2)
+                minDistSonar=Math.min(minDistSonar,sonars.getMeasurement(i));
+        }
+
+        //System.out.println(minDistBumper);
 
         if(intensityLeft >=0.0329){
             state= robotState.GoalReached;
@@ -94,28 +113,36 @@ public class IBug {
             myRobot.setRotationalVelocity(0);
             myRobot.setTranslationalVelocity(0);
         }
+
         if (state==robotState.MoveToGoal)        {
-            for (int i=0;i<sonars.getNumSensors();i++)       {
-                double ph = wrapToPi(sonars.getSensorAngle(i));
-                if (Math.abs(ph/*-f2g*/)<=Math.PI/2)
-                    minDist=Math.min(minDist,sonars.getMeasurement(i));
+            moveToGoal();
+            if(!foundObstacle(minDistBumper)){
+                state=robotState.MoveToGoal;
             }
-            if (minDist>SAFETY) {
-                moveToGoal();
-                //System.out.println("I got in here");
-            }
-            else {
+            else{
+                myRobot.setTranslationalVelocity(-1);
+                myRobot.setRotationalVelocity(0);
                 state=robotState.CircumNavigate;
-                localMaxIntensity = intensityLeft;
-                //sp = null;
-                //circle=false;
+                localMax = intensityLeft;
             }
+            /*if (minDistBumper>bumperDetectionThreshold) {
+                moveToGoal();
+                System.out.println("Moving to goal");
+            }*/
         }
+
         if (state==robotState.CircumNavigate) {
-            if (localMaxIntensity < intensityLeft) {
+            //System.out.println(intensityL + " " + left);
+            if (localMax<intensityLeft)
                 circumNavigate();
+            /*if (localMax < intensityLeft) {
+                circumNavigate();
+                //state = robotState.MoveToGoal;
+                System.out.println("Circumnavigating");
             }
-            /*if (intensityH>intensityL){
+            else{
+                temp=0;
+                //System.out.println("intensityH>left");
                 myRobot.setRotationalVelocity(Math.signum(right- intensityLeft));
 
                 for(int i=0; i<sonars.getNumSensors(); i++){
@@ -123,14 +150,15 @@ public class IBug {
                         temp++;
                     }
                 }
-                System.out.println("temp is: " + temp);
+                //System.out.println("temp is: " + temp);
                 if(temp==4)
                     state = robotState.MoveToGoal;*/
 
                 //if(sonars.getMeasurement(0)==1.5){
-                //state = robotState.MoveToGoal;
+                    //state = robotState.MoveToGoal;
                 //}
             }
+        System.out.println(state);
         }
             /*else            {
                 if (cp.distance(sp)>ZERO && !circle)
@@ -148,5 +176,4 @@ public class IBug {
 
 
     //}
-
 }
