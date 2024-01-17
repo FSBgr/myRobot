@@ -12,9 +12,14 @@ import javax.vecmath.Vector3d;
 public class IBug {
     RangeSensorBelt bumpers, sonars;
     LightSensor l, r, m;
-    double intensityL, intensityH, left, right, middle, trans=2, rot=2, SAFETY=0.8;
+    double intensityL, intensityH, left, right, middle, K1=5, K2=0.8, K3=1, SAFETY=1;
     Agent myRobot;
     boolean CLOCKWISE;
+    public enum robotState {
+        MoveToGoal, CircumNavigate, GoalReached
+    }
+    private robotState state;
+    int temp=0;
 
     public IBug(Agent myRobot, RangeSensorBelt sonars, RangeSensorBelt bumpers, LightSensor l, LightSensor r, LightSensor m){
         this.myRobot = myRobot;
@@ -23,6 +28,7 @@ public class IBug {
         this.l=l;
         this.r=r;
         this.m=m;
+        state=robotState.MoveToGoal;
     }
 
     private Point3d getSensedPoint(int sonar){
@@ -61,30 +67,84 @@ public class IBug {
         Vector3d v;
         v = CLOCKWISE? new Vector3d(-p.z,0,p.x): new Vector3d(p.z,0,-p.x);
         double phLin = Math.atan2(v.z,v.x);
-        double phRot =Math.atan(rot*(d-SAFETY));
+        double phRot =Math.atan(K3*(d-SAFETY));
         if (CLOCKWISE)
             phRot=-phRot;
         double phRef = wrapToPi(phLin+phRot);
 
-        myRobot.setRotationalVelocity(rot*phRef);
-        myRobot.setTranslationalVelocity(trans*Math.cos(phRef));
+        myRobot.setRotationalVelocity(K1*phRef);
+        myRobot.setTranslationalVelocity(K2*Math.cos(phRef));
     }
 
     public void step(){
+        double minDist=2*SAFETY;
         middle = m.getLux();
         left = l.getLux();
         right = r.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
 
+        System.out.println(sonars.getMeasurement(0) +" "+ sonars.getMeasurement(1) +" "+ sonars.getMeasurement(2) +" "+ sonars.getMeasurement(3));
+
         intensityL = left;
-        moveToGoal();
-        /*if(intensityL>=0.329){
+
+        if(left>=0.0329){
+            state= robotState.GoalReached;
+        }
+
+        if (state==robotState.GoalReached){
             myRobot.setRotationalVelocity(0);
             myRobot.setTranslationalVelocity(0);
         }
+        if (state==robotState.MoveToGoal)        {
+            for (int i=0;i<sonars.getNumSensors();i++)       {
+                double ph = wrapToPi(sonars.getSensorAngle(i));
+                if (Math.abs(ph/*-f2g*/)<=Math.PI/2)
+                    minDist=Math.min(minDist,sonars.getMeasurement(i));
+            }
+            if (minDist>SAFETY) {
+                moveToGoal();
+                //System.out.println("I got in here");
+            }
+            else {
+                state=robotState.CircumNavigate;
+                intensityH = left;
+                //sp = null;
+                //circle=false;
+            }
+        }
+        if (state==robotState.CircumNavigate) {
+            if (intensityH < left) {
+                circumNavigate();
+            }
+            if (intensityH>intensityL){
+                myRobot.setRotationalVelocity(Math.signum(right-left));
 
-        myRobot.setRotationalVelocity(Math.signum(right-left)); // v_orientation
-        myRobot.setTranslationalVelocity(2);
-*/
+                for(int i=0; i<sonars.getNumSensors(); i++){
+                    if(sonars.getMeasurement(i)>=SAFETY){
+                        temp++;
+                    }
+                }
+                System.out.println("temp is: " + temp);
+                if(temp==4)
+                    state = robotState.MoveToGoal;
+
+                //if(sonars.getMeasurement(0)==1.5){
+                    //state = robotState.MoveToGoal;
+                //}
+            }
+        }
+            /*else            {
+                if (cp.distance(sp)>ZERO && !circle)
+                    circle=true;
+                if (cp.distance(sp)<=ZERO && circle)
+                    SimpleBehaviors.stop(rob);
+                else{
+                    double f= Tools.getGlobalAngleToGoal(rob,goal);
+                    if (Math.abs(f-AngleToGoal)<0.05 && sp.distance(goal)>cp.distance(goal))
+                        state = robotState.MoveToGoal;
+                    else
+                        SimpleBehaviors.circumNavigate(rob,sonars,CLOCKWISE);
+                }*/
+
 
 
     }
