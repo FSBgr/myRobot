@@ -181,6 +181,7 @@ public class IBug2 {
                     else
                         SimpleBehaviors.circumNavigate(rob,sonars,CLOCKWISE);
                 }*/
+    //}
 
 
 
