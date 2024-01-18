@@ -185,5 +185,5 @@ public class IBug2 {
 
 
 
-    //this is the version with the bumper
+    //this is the version with the bumper crash detection
 }
