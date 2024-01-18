@@ -12,7 +12,7 @@ public class Env extends EnvironmentDescription {
     Wall wall1, wall2, wall3, wall4;
 
     Env(){
-        setWorldSize(100);
+        setWorldSize(10);
 
         wall1 = new Wall(new Vector3d(1,0,4), 4,1, this);
         wall2 = new Wall(new Vector3d(3,0,5), 2,1, this);
@@ -21,10 +21,6 @@ public class Env extends EnvironmentDescription {
         wall3.rotate90(1);
         wall4 = new Wall(new Vector3d(1, 0, 7), 4,1, this);
 
-        //add(new Box(new Vector3d(-5,0,-5), new Vector3f(1,1,1), this));
-        /*add(new Box(new Vector3d(-4,0,1), new Vector3f(1,1,1),this));
-        add(new Box(new Vector3d(-5,0,4), new Vector3f(1,1,1),this));
-        add(new Box(new Vector3d(-4,0,7), new Vector3f(1,1,1),this));*/
         //TODO: Try a layout with a Π shape
         add(wall1);
         add(wall2);
