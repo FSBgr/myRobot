@@ -71,7 +71,7 @@ public class IBugMain {
         if (state == robotState.MoveToGoal) {
             for (int i = 0; i < sonars.getNumSensors(); i++) {
                 double ph = Methods.wrapToPi(sonars.getSensorAngle(i));
-                if (Math.abs(ph/*-f2g*/) <= Math.PI / 2)
+                if (Math.abs(ph) <= Math.PI / 2)
                     minDist = Math.min(minDist, sonars.getMeasurement(i));
             }
             if (minDist > SAFETY) {

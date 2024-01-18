@@ -126,10 +126,6 @@ public class IBug2 {
                 state=robotState.CircumNavigate;
                 localMax = intensityLeft;
             }
-            /*if (minDistBumper>bumperDetectionThreshold) {
-                moveToGoal();
-                System.out.println("Moving to goal");
-            }*/
         }
 
         if (state==robotState.CircumNavigate) {

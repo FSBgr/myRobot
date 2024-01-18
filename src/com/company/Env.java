@@ -14,17 +14,18 @@ public class Env extends EnvironmentDescription {
     Env(){
         setWorldSize(10);
 
-        wall1 = new Wall(new Vector3d(1,0,4), 4,1, this);
-        wall2 = new Wall(new Vector3d(3,0,5), 2,1, this);
-        wall2.rotate90(1);
-        wall3 = new Wall(new Vector3d(-1,0,-2.5), 13, 1, this);
+        wall1 = new Wall(new Vector3d(-1,0,-3), 12, 1, this);
+        wall1.rotate90(1);
+        wall2 = new Wall(new Vector3d(1,0,3), 4,1, this);
+        wall3 = new Wall(new Vector3d(3,0,5), 4,1, this);
         wall3.rotate90(1);
+
         wall4 = new Wall(new Vector3d(1, 0, 7), 4,1, this);
 
         //TODO: Try a layout with a Π shape
         add(wall1);
         add(wall2);
-        add(wall3);
+        //add(wall3);
         //add(wall4);
 
         add(new CherryAgent(new Vector3d(7,0,7),"cherry",0.1f));
