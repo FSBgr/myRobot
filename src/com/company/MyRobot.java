@@ -20,7 +20,7 @@ public class MyRobot extends Agent {
         m = RobotFactory.addLightSensor(this);
         l = RobotFactory.addLightSensor(this, new Vector3d(0.18, 0.25, 0.18), 1, "left");
         r = RobotFactory.addLightSensor(this, new Vector3d(0.18, 0.25, -0.18), 1, "right");
-        iBug = new IBugMain(this, sonars, bumpers, l,r,m);
+        iBug = new IBugMain(this, sonars, l,r,m);
         iBug2 = new IBug2(this, sonars, bumpers, l,r,m);
 
     }
