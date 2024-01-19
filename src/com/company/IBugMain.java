@@ -16,7 +16,7 @@ public class IBugMain {
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
-        MoveToGoal, CircumNavigate, GoalReached
+        MoveToGoal, CircumNavigate, GoalReached, Start
     }
     private robotState state;
 
@@ -28,7 +28,8 @@ public class IBugMain {
         this.l = l;
         this.r = r;
         this.m = m;
-        state = robotState.MoveToGoal;
+        state = robotState.Start;
+        this.CLOCKWISE = false;
     }
 
     private void moveToGoal() {
@@ -56,6 +57,8 @@ public class IBugMain {
         myRobot.setTranslationalVelocity(K2 * Math.cos(phRef));
     }
 
+    //TODO: handle case where light source directly behind (works fine for the other cases)
+
     public void step() {
         double minDist = 2 * SAFETY;
         intensityMiddle = m.getLux();
@@ -63,10 +66,19 @@ public class IBugMain {
         intensityRight = r.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
         intensityL = intensityLeft;
 
-        if (intensityRight >= 0.06) {
+        if (intensityLeft >= 0.06) {
             state = robotState.GoalReached;
         }
 
+        if(state==robotState.Start){
+            if(intensityMiddle>intensityLeft && intensityMiddle>intensityRight) {
+                if (!CLOCKWISE)
+                    myRobot.rotateY(1);
+                else
+                    myRobot.rotateY(-1);
+            }
+            state = robotState.MoveToGoal;
+        }
 
         if (state == robotState.MoveToGoal) {
             for (int i = 0; i < sonars.getNumSensors(); i++) {
@@ -92,13 +104,14 @@ public class IBugMain {
 
         if (state == robotState.CircumNavigate) {
             circumNavigate();
-            if (intensityRight > intensityH) {
+            if (intensityRight > intensityH)
                 state = robotState.MoveToGoal;
-            }
-            if (intensityRight > intensityLeft) {
-                state = robotState.MoveToGoal;
-            }
 
-            }
+            // we are moving counter clockwise, left lightsensor should have higher value, if circumnavigating but right sensor has higher value than left, means
+            // we are going away from the goal so no need to keep circumnavigating and therefore proceed to goal
+            if (intensityRight > intensityLeft)
+                state = robotState.MoveToGoal;
+
         }
+    }
 }

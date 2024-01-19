@@ -10,7 +10,6 @@ import javax.vecmath.Vector3d;
 public class MyRobot extends Agent {
     RangeSensorBelt bumpers, sonars;
     LightSensor l, r, m;
-    //IBug iBug;
     IBug2 iBug2;
     IBugMain iBug;
 
@@ -31,7 +30,6 @@ public class MyRobot extends Agent {
 
     public void performBehavior()
     {
-        //iBug.step();
         //iBug2.step();
         iBug.step();
     }
