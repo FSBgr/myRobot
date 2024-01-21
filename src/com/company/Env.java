@@ -1,11 +1,8 @@
 package com.company;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
 import simbad.sim.*;
-
 import java.awt.*;
-import java.util.Vector;
 
 /**
  * @author Christos Christidis
@@ -86,7 +83,6 @@ public class Env extends EnvironmentDescription {
             System.err.println(e.getMessage());
         }
 
-        add(new CherryAgent(new Vector3d(7,0,7),"cherry",0.1f));
         add(new MyRobot(robotPosition, "robot 1"));
         light1SetPosition(-7, -6, -7);
         light1Color = new Color3f(Color.BLACK);

@@ -13,13 +13,11 @@ import javax.vecmath.Vector3d;
  * @author Christidis Christos
  */
 
-//TODO: handle case where light source directly behind (works for directly behind counterclockwise and all other cases)
 
 public class IBugMain {
     RangeSensorBelt sonars;
     LightSensor l, r, m;
     double intensityL, intensityH, intensityLeft, intensityRight, intensityMiddle;
-    //double goalSafetyDist=0.08,  K1 = 5, K2 = 0.8, K3 = 1, SAFETY = 1;
     double goalSafetyDist=0.08,  K1 = 4, K2 = 0.8, K3 = 1, SAFETY = 1;
     Agent myRobot;
     boolean CLOCKWISE;

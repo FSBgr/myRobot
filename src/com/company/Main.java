@@ -1,6 +1,5 @@
 package com.company;
 import simbad.gui.Simbad;
-
 import javax.vecmath.Vector3d;
 
 public class Main {
