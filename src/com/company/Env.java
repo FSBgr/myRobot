@@ -14,6 +14,7 @@ public class Env extends EnvironmentDescription {
     Color3f white = new Color3f(Color.white);
     Color3f lightGray = new Color3f(Color.lightGray);
     Wall wall1, wall2, wall3, wall4;
+    int lightX=7, lightY=2, lightZ=-7;
 
     Env(){
 
@@ -22,34 +23,69 @@ public class Env extends EnvironmentDescription {
     /**
      *
      * @param scenario: different wall/obstacle configurations are created based on this
-     * @param lightX: light position X
-     * @param lightY: light position Y
-     * @param lightZ: light position Z
      * @param robotPosition: vector based on which the robot will be placed on the map
+     * @param lightPosition: string, position of light on the environment
      */
-    Env(int scenario, double lightX, double lightY, double lightZ, Vector3d robotPosition) {
-        switch (scenario) {
-            case 1:
-                wallCreator();
-                break;
+    Env(int scenario, String lightPosition, Vector3d robotPosition) {
 
-            case 2:
-                wallCreator();
-                wall3 = new Wall(new Vector3d(3,0,5), 4,1, this);
-                wall3.rotate90(1);
-                add(wall3);
-                break;
-
-            case 3:
-                wallCreator();
-                wall3 = new Wall(new Vector3d(3,0,5), 4,1, this);
-                wall3.rotate90(1);
-                wall4 = new Wall(new Vector3d(1, 0, 7), 4,1, this);
-                add(wall3);
-                add(wall4);
-                break;
+        try {
+            switch (lightPosition) {
+                case "topLeft":
+                    lightX = -7;
+                    lightZ = -7;
+                    break;
+                case "bottomLeft":
+                    lightX = -7;
+                    lightZ = 7;
+                    break;
+                case "topRight":
+                    lightX = 7;
+                    lightZ = -7;
+                    break;
+                case "bottomRight":
+                    lightX = 7;
+                    lightZ = 7;
+                    break;
+                default:
+                    throw new InvalidLightPositionException("Invalid light position: " + lightPosition);
+            }
+        } catch (InvalidLightPositionException error) {
+            System.err.println(error.getMessage());
 
         }
+
+        try {
+            switch (scenario) {
+                case 1:
+                    wallCreator();
+                    break;
+                case 2:
+                    wallCreator();
+                    wall3 = new Wall(new Vector3d(3, 0, 5), 4, 1, this);
+                    wall3.rotate90(1);
+                    add(wall3);
+                    break;
+                case 3:
+                    wallCreator();
+                    wall3 = new Wall(new Vector3d(3, 0, 5), 4, 1, this);
+                    wall3.rotate90(1);
+                    wall4 = new Wall(new Vector3d(1, 0, 7), 4, 1, this);
+                    add(wall3);
+                    add(wall4);
+                    break;
+                case 4:
+                    wallCreator();
+                    wall3 = new Wall(new Vector3d(3, 0, 1), 4, 1, this);
+                    wall3.rotate90(1);
+                    add(wall3);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid scenario: " + scenario);
+            }
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
+
         add(new CherryAgent(new Vector3d(7,0,7),"cherry",0.1f));
         add(new MyRobot(robotPosition, "robot 1"));
         light1SetPosition(-7, -6, -7);
