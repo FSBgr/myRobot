@@ -13,10 +13,13 @@ import javax.vecmath.Vector3d;
  * @author Christidis Christos
  */
 
+//TODO: handle case where light source directly behind (works for directly behind counterclockwise and all other cases)
+
 public class IBugMain {
-    RangeSensorBelt bumpers, sonars;
+    RangeSensorBelt sonars;
     LightSensor l, r, m;
-    double intensityL, intensityH, intensityLeft, intensityRight, intensityMiddle, K1 = 5, K2 = 0.8, K3 = 1, SAFETY = 1;
+    double intensityL, intensityH, intensityLeft, intensityRight, intensityMiddle;
+    double goalSafetyDist=0.08,  K1 = 5, K2 = 0.8, K3 = 1, SAFETY = 1;
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
@@ -92,8 +95,6 @@ public class IBugMain {
         myRobot.setTranslationalVelocity(K2 * Math.cos(phRef));
     }
 
-    //TODO: handle case where light source directly behind (works fine for the other cases)
-
     /**
      * Performs a step in the robot's behavior, incorporating obstacle avoidance and navigation logic.
      * The method evaluates sensor data, adjusts the robot's orientation and velocity, and transitions between
@@ -109,7 +110,7 @@ public class IBugMain {
         intensityL = intensityLeft;
 
         //Check if goal is reached
-        if (intensityLeft >= 0.06) {
+        if (intensityLeft >= goalSafetyDist) {
             state = robotState.GoalReached;
         }
 
@@ -159,7 +160,7 @@ public class IBugMain {
             // Checking conditions for transitioning back to MoveToGoal state
             // We are moving counter clockwise, left light sensor should have higher value, if circumnavigating but
             // right sensor has higher value than left, means we are going away from the goal so no need to keep
-            // circumnavigating and therefore proceed to goal
+            // circumnavigating and therefore proceed to goal. Works for counterclockwise rotation.
             if (intensityRight > intensityLeft)
                 state = robotState.MoveToGoal;
         }

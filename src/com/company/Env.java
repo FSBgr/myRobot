@@ -7,6 +7,9 @@ import simbad.sim.*;
 import java.awt.*;
 import java.util.Vector;
 
+/**
+ * @author Christos Christidis
+ */
 public class Env extends EnvironmentDescription {
     Color3f white = new Color3f(Color.white);
     Color3f lightGray = new Color3f(Color.lightGray);
@@ -27,36 +30,24 @@ public class Env extends EnvironmentDescription {
     Env(int scenario, double lightX, double lightY, double lightZ, Vector3d robotPosition) {
         switch (scenario) {
             case 1:
-                wall1 = new Wall(new Vector3d(-1,0,-3), 12, 1, this);
-                wall1.rotate90(1);
-                wall2 = new Wall(new Vector3d(1,0,3), 4,1, this);
-
-                add(wall1);
-                add(wall2);
+                wallCreator();
+                break;
 
             case 2:
-                wall1 = new Wall(new Vector3d(-1,0,-3), 12, 1, this);
-                wall1.rotate90(1);
-                wall2 = new Wall(new Vector3d(1,0,3), 4,1, this);
+                wallCreator();
                 wall3 = new Wall(new Vector3d(3,0,5), 4,1, this);
                 wall3.rotate90(1);
-
-                add(wall1);
-                add(wall2);
                 add(wall3);
+                break;
 
             case 3:
-                wall1 = new Wall(new Vector3d(-1,0,-3), 12, 1, this);
-                wall1.rotate90(1);
-                wall2 = new Wall(new Vector3d(1,0,3), 4,1, this);
+                wallCreator();
                 wall3 = new Wall(new Vector3d(3,0,5), 4,1, this);
                 wall3.rotate90(1);
                 wall4 = new Wall(new Vector3d(1, 0, 7), 4,1, this);
-
-                add(wall1);
-                add(wall2);
                 add(wall3);
                 add(wall4);
+                break;
 
         }
         add(new CherryAgent(new Vector3d(7,0,7),"cherry",0.1f));
@@ -70,6 +61,18 @@ public class Env extends EnvironmentDescription {
         showAxis(true);
         ambientLightColor = white;
         backgroundColor = lightGray;
+    }
+
+    /**
+     * Simple wall creator, makes the baseline environment on top of which the rest of the scenarios will be based on
+     */
+    private void wallCreator(){
+        wall1 = new Wall(new Vector3d(-1,0,-3), 12, 1, this);
+        wall1.rotate90(1);
+        wall2 = new Wall(new Vector3d(1,0,3), 4,1, this);
+
+        add(wall1);
+        add(wall2);
     }
 
 }
