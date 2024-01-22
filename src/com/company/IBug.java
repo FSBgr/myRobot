@@ -14,11 +14,11 @@ import javax.vecmath.Vector3d;
  */
 
 
-public class IBugMain {
+public class IBug {
     RangeSensorBelt sonars;
-    LightSensor l, r, m;
+    LightSensor leftSensor, rightSensor, middleSensor;
     double intensityL, intensityH, intensityLeft, intensityRight, intensityMiddle;
-    double goalSafetyDist=0.08,  K1 = 4, K2 = 0.8, K3 = 1, SAFETY = 1;
+    double GOALSAFETY = 0.08,  K1 = 4, K2 = 0.8, K3 = 1, OBSTACLESAFETY = 1;
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
@@ -31,16 +31,16 @@ public class IBugMain {
      *
      * @param myRobot: The robot performing the task
      * @param sonars: The whole sonar belt
-     * @param l: left light sensor
-     * @param r: right light sensor
-     * @param m: middle/back light sensor
+     * @param leftSensor: left light sensor
+     * @param rightSensor: right light sensor
+     * @param middleSensor: middle/back light sensor
      */
-    public IBugMain(Agent myRobot, RangeSensorBelt sonars, LightSensor l, LightSensor r, LightSensor m) {
+    public IBug(Agent myRobot, RangeSensorBelt sonars, LightSensor leftSensor, LightSensor rightSensor, LightSensor middleSensor) {
         this.myRobot = myRobot;
         this.sonars = sonars;
-        this.l = l;
-        this.r = r;
-        this.m = m;
+        this.leftSensor = leftSensor;
+        this.rightSensor = rightSensor;
+        this.middleSensor = middleSensor;
         state = robotState.Start;
         this.CLOCKWISE = false;
     }
@@ -59,34 +59,35 @@ public class IBugMain {
      * The robot adjusts its velocities to navigate around obstacles while avoiding collisions.
      */
     private void circumNavigate() {
-        int min;
-        min = 0;
+        int minimumMeasurement = 0;
+        double robotObstacleDistance, phLin, phRot, phRef;
+        Vector3d perVector;
 
         // Find the sonar sensor with the minimum measurement
         for (int i = 1; i < sonars.getNumSensors(); i++)
-            if (sonars.getMeasurement(i) < sonars.getMeasurement(min))
-                min = i;
+            if (sonars.getMeasurement(i) < sonars.getMeasurement(minimumMeasurement))
+                minimumMeasurement = i;
 
         // Retrieve the 3D position of the minimum sonar measurement
-        Point3d p = Methods.getSensedPoint(min, sonars, myRobot);
+        Point3d collisionPoint = Methods.getCollisionPoint(minimumMeasurement, sonars, myRobot);
 
         // Calculate the distance from the robot to the obstacle
-        double d = p.distance(new Point3d(0, 0, 0));
+        robotObstacleDistance = collisionPoint.distance(new Point3d(0, 0, 0));
 
         // Calculate a 3D vector perpendicular to the line connecting the robot to the obstacle
-        Vector3d v;
-        v = CLOCKWISE ? new Vector3d(-p.z, 0, p.x) : new Vector3d(p.z, 0, -p.x);
+
+        perVector = CLOCKWISE ? new Vector3d(-collisionPoint.z, 0, collisionPoint.x) : new Vector3d(collisionPoint.z, 0, -collisionPoint.x);
 
         // Calculate orientation angles
-        double phLin = Math.atan2(v.z, v.x);
-        double phRot = Math.atan(K3 * (d - SAFETY));
+        phLin = Math.atan2(perVector.z, perVector.x);
+        phRot = Math.atan(K3 * (robotObstacleDistance - OBSTACLESAFETY));
 
         // Adjust the sign of phRot based on the CLOCKWISE flag
         if (CLOCKWISE)
             phRot = -phRot;
 
         // Calculate the wrapped orientation angle
-        double phRef = Methods.wrapToPi(phLin + phRot);
+        phRef = Methods.wrapToPi(phLin + phRot);
 
         // Set the robot's rotational velocity based on the wrapped orientation angle
         myRobot.setRotationalVelocity(K1 * phRef);
@@ -100,16 +101,16 @@ public class IBugMain {
      * different states based on the robot's proximity to the goal.
      */
     public void step() {
-        double minDist = 2 * SAFETY;
+        double minDist = 2 * OBSTACLESAFETY;
 
         // Intensity values from light sensors
-        intensityMiddle = m.getLux();
-        intensityLeft = l.getLux();
-        intensityRight = r.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
+        intensityMiddle = middleSensor.getLux();
+        intensityLeft = leftSensor.getLux();
+        intensityRight = rightSensor.getLux();  // right-left -> orientation to target left and right have same value, greater than middle
         intensityL = intensityLeft;
 
         //Check if goal is reached
-        if (intensityLeft >= goalSafetyDist) {
+        if (intensityLeft >= GOALSAFETY) {
             state = robotState.GoalReached;
         }
 
@@ -133,7 +134,7 @@ public class IBugMain {
             }
 
             // Decide whether to move towards the goal or circumnavigate obstacles
-            if (minDist > SAFETY) {
+            if (minDist > OBSTACLESAFETY) {
                 moveToGoal();
             } else {
                 state = robotState.CircumNavigate;

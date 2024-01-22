@@ -9,5 +9,5 @@ public class Main {
         Vector3d topLeft = new Vector3d(-7, 0, -7);
         Vector3d bottomLeft = new Vector3d(-7, 0, 7);
 
-        Simbad frame = new Simbad(new Env(3, "bottomRight", topLeft) ,false); }
+        Simbad frame = new Simbad(new MyEnvironment(3, 7,7, topLeft) ,false); }
 }

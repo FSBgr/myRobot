@@ -1,19 +1,21 @@
 package com.company;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import simbad.sim.*;
 import java.awt.*;
 
 /**
  * @author Christos Christidis
  */
-public class Env extends EnvironmentDescription {
+public class MyEnvironment extends EnvironmentDescription {
     Color3f white = new Color3f(Color.white);
     Color3f lightGray = new Color3f(Color.lightGray);
     Wall wall1, wall2, wall3, wall4;
     int lightX=7, lightY=2, lightZ=-7;
 
-    Env(){
+    MyEnvironment(){
 
     }
 
@@ -21,35 +23,8 @@ public class Env extends EnvironmentDescription {
      *
      * @param scenario: different wall/obstacle configurations are created based on this
      * @param robotPosition: vector based on which the robot will be placed on the map
-     * @param lightPosition: string, position of light on the environment
      */
-    Env(int scenario, String lightPosition, Vector3d robotPosition) {
-
-        try {
-            switch (lightPosition) {
-                case "topLeft":
-                    lightX = -7;
-                    lightZ = -7;
-                    break;
-                case "bottomLeft":
-                    lightX = -7;
-                    lightZ = 7;
-                    break;
-                case "topRight":
-                    lightX = 7;
-                    lightZ = -7;
-                    break;
-                case "bottomRight":
-                    lightX = 7;
-                    lightZ = 7;
-                    break;
-                default:
-                    throw new InvalidLightPositionException("Invalid light position: " + lightPosition);
-            }
-        } catch (InvalidLightPositionException error) {
-            System.err.println(error.getMessage());
-
-        }
+    MyEnvironment(int scenario, int lightX, int lightZ, Vector3d robotPosition) {
 
         try {
             switch (scenario) {
@@ -75,6 +50,14 @@ public class Env extends EnvironmentDescription {
                     wall3 = new Wall(new Vector3d(3, 0, 1), 4, 1, this);
                     wall3.rotate90(1);
                     add(wall3);
+                    break;
+                case 5:
+                    wallCreator();
+                    add(new Box(new Vector3d(4, 0, 6), new Vector3f(1, 1, 1), this));
+                    break;
+                case 6:
+                    add(new Box(new Vector3d(5, 0, 5), new Vector3f(1, 1, 1), this));
+                    add(new Box(new Vector3d(3, 0, 7), new Vector3f(1, 1, 1), this));
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid scenario: " + scenario);
