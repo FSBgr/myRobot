@@ -63,6 +63,9 @@ public class MyEnvironment extends EnvironmentDescription {
                     break;
                 case 7:
                     add(new Arch(new Vector3d(7,0,-2),this));
+                    add(new Box(new Vector3d(5, 0, 5), new Vector3f(1, 1, 1), this));
+                    add(new Box(new Vector3d(4, 0, 7), new Vector3f(1, 1, 1), this));
+                    add(new Wall(new Vector3d(5,0,2), 3,1,this));
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid scenario: " + scenario);
