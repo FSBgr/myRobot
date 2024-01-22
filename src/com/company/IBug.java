@@ -17,8 +17,9 @@ import javax.vecmath.Vector3d;
 public class IBug {
     RangeSensorBelt sonars;
     LightSensor leftSensor, rightSensor, middleSensor;
+    double transVel = 2;
     double intensityL, intensityH, intensityLeft, intensityRight, intensityMiddle;
-    double GOALSAFETY = 0.08,  K1 = 4, K2 = 0.8, K3 = 1, OBSTACLESAFETY = 1;
+    double GOALSAFETY = 0.08,  K1 = 4, K2 = 0.8, K3 = 1, OBSTACLESAFETY = 0.9;
     Agent myRobot;
     boolean CLOCKWISE;
     public enum robotState {
@@ -51,7 +52,7 @@ public class IBug {
      */
     private void moveToGoal() {
         myRobot.setRotationalVelocity(Math.signum(intensityRight - intensityLeft)); // v_orientation
-        myRobot.setTranslationalVelocity(2);
+        myRobot.setTranslationalVelocity(transVel);
     }
 
     /**
@@ -110,7 +111,7 @@ public class IBug {
         intensityL = intensityLeft;
 
         //Check if goal is reached
-        if (intensityLeft >= GOALSAFETY) {
+        if (intensityLeft >= GOALSAFETY || intensityRight >= GOALSAFETY) {
             state = robotState.GoalReached;
         }
 

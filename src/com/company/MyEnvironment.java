@@ -52,12 +52,17 @@ public class MyEnvironment extends EnvironmentDescription {
                     add(wall3);
                     break;
                 case 5:
-                    wallCreator();
+                    wall1 = new Wall(new Vector3d(-1,0,-3), 12, 1, this);
+                    wall1.rotate90(1);
+                    add(wall1);
                     add(new Box(new Vector3d(4, 0, 6), new Vector3f(1, 1, 1), this));
                     break;
                 case 6:
                     add(new Box(new Vector3d(5, 0, 5), new Vector3f(1, 1, 1), this));
                     add(new Box(new Vector3d(3, 0, 7), new Vector3f(1, 1, 1), this));
+                    break;
+                case 7:
+                    add(new Arch(new Vector3d(7,0,-2),this));
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid scenario: " + scenario);
